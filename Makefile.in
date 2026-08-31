@@ -361,25 +361,25 @@ msvcr80.def msvcr80d.def \
 msvcr90.def msvcr90d.def: msvcrt.def.in
 	$(CC) -DRUNTIME=$(basename $(notdir $@)) \
 		-D__$(basename $(notdir $@))__=1 \
-		-D__MSVCRT__ -C -E -P \
+		-D__MSVCRT__ -E -P \
 		-xc-header $? > $@
 
 moldname-crtdll.def: moldname.def.in
 	$(CC) -DRUNTIME=crtdll \
 		-D__FILENAME__=moldname-crtdll.def \
-		-D__CRTDLL__  -C -E -P \
+		-D__CRTDLL__  -E -P \
 		-xc-header $? > $@
 
 moldname-msvcrt.def: moldname.def.in
 	$(CC) -DRUNTIME=msvcrt \
 		-D__FILENAME__=moldname-msvcrt.def \
-		-D__MSVCRT__  -C -E -P \
+		-D__MSVCRT__  -E -P \
 		-xc-header $? > $@
 
 moldname-coredll.def: moldname.def.in
 	$(CC) -DRUNTIME=coredll \
 		-D__FILENAME__=moldname-coredll.def \
-		-D__COREDLL__  -C -E -P \
+		-D__COREDLL__  -E -P \
 		-xc-header $? > $@
 
 libcoldname.a: moldname-crtdll.def $(MOLD_OBJS)

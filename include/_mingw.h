@@ -116,7 +116,7 @@
 # endif
 # define NONAMELESSUNION
 #elif defined(__GNUC__)
-# ifdef __declspec
+# if defined(__declspec) || defined(__clang__)
 #  ifndef __MINGW_IMPORT
    /* Note the extern. This is needed to work around GCC's
       limitations in handling dllimport attribute.  */
@@ -130,7 +130,7 @@
 #   endif
 #  endif
 #  define __DECLSPEC_SUPPORTED
-# else /* __declspec */
+# else /* !__declspec && !__clang__ */
 #  undef __DECLSPEC_SUPPORTED
 #  undef __MINGW_IMPORT
 #  ifndef _CRTIMP
