@@ -5,9 +5,11 @@
  * This file is a part of the mingw-runtime package.
  * No warranty is given; refer to the file DISCLAIMER within the package.
  *
- * io.h declares _lseeki64() under __MSVCRT__; on COREDLL the fd *is*
- * the Win32 handle, so SetFilePointerEx (present in CE 4.x/5.x/6.x
- * COREDLL) gives the 64-bit seek directly.
+ * io.h declares _lseeki64() under __COREDLL__.  COREDLL exports
+ * SetFilePointer but NOT SetFilePointerEx (checked against the CE
+ * 4.x/5.x/6.x export lists), so the 64-bit move is done through
+ * SetFilePointer's lpDistanceToMoveHigh out-parameter.  The fd *is*
+ * the Win32 handle on this CRT (mingwex/wince/open.c).
  */
 
 #include <windows.h>
@@ -16,8 +18,9 @@
 __int64
 _lseeki64 (int fd, __int64 offset, int whence)
 {
-  LARGE_INTEGER li;
   DWORD mode;
+  LONG hi = (LONG) (offset >> 32);
+  DWORD lo;
 
   switch (whence)
     {
@@ -34,8 +37,8 @@ _lseeki64 (int fd, __int64 offset, int whence)
       mode = (DWORD) -1;
     }
 
-  li.QuadPart = offset;
-  if (!SetFilePointerEx ((HANDLE) fd, li, &li, mode))
+  lo = SetFilePointer ((HANDLE) fd, (LONG) (offset & 0xFFFFFFFF), &hi, mode);
+  if (lo == INVALID_SET_FILE_POINTER && GetLastError () != NO_ERROR)
     return -1;
-  return li.QuadPart;
+  return ((__int64) hi << 32) | lo;
 }
