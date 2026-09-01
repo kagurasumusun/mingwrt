@@ -440,6 +440,16 @@ __CRT_INLINE int __cdecl _isnanl (long double _x)
 
 #endif /* __COREDLL__ */
 
+#ifdef __MINGW32CE__
+/* Float classification helpers used by the mingwex/mathce code.  The
+   COREDLL exports _isnan/_isnanf/_finite; the BSD-style names below are
+   provided by mingwex (mathce/s_isinff.c, mathce/s_isnanf.c,
+   mathce/s_finitef.c).  */
+extern int __cdecl isinff (float);
+extern int __cdecl isnanf (float);
+extern int __cdecl finitef (float);
+#endif /* __MINGW32CE__ */
+
 /* 7.12.3.5 */
 #define isnormal(x) (fpclassify(x) == FP_NORMAL)
 

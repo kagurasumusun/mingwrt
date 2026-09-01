@@ -1,8 +1,6 @@
 #ifndef _FENV_H_
 #define _FENV_H_
 
-#ifdef __i386__
-
 #include <_mingw.h>
 
 /* FPU status word exception flags */
@@ -32,6 +30,8 @@
 /* How much to shift FE control word rounding flags
    to get MXCSR rounding flags,  */
 #define __MXCSR_ROUND_FLAG_SHIFT 3
+
+#ifdef __i386__
 
 #ifndef RC_INVOKED
 /*
@@ -105,6 +105,14 @@ extern int __cdecl __MINGW_NOTHROW feholdexcept (fenv_t *);
 }
 #endif
 #endif	/* Not RC_INVOKED */
+
+#else /* !__i386__ */
+
+/* On non-x86 targets (e.g. Windows CE on ARM) the fenv_t type and the
+   fe* functions are not provided: COREDLL has no floating-point
+   environment API, and the x87-dependent mingwex implementations cannot
+   be built.  The FE_* flag/rounding constants above remain available as
+   they are architecture-independent C99 values.  */
 
 #endif /* __i386__ */
 

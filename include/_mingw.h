@@ -245,6 +245,16 @@
 #define __MINGW_ATTRIB_NONNULL(arg)
 #endif /* GNUC >= 3.3 */
 
+#if defined(UNDER_CE) || defined(_WIN32_WCE)
+/* A Windows CE build is selected with UNDER_CE / _WIN32_WCE.  The
+   historical CeGCC GCC driver also predefined __MINGW32CE__, which the
+   mingwex/mathce sources key on; clang/LLVM does not predefine it, so
+   define it here to keep the same CE code paths active.  */
+# ifndef __MINGW32CE__
+#  define __MINGW32CE__ 1
+# endif
+#endif
+
 #if defined(UNDER_CE) && defined(__arm__)
 /* ARM Windows CE is not underscored.  */
 # define __U(SYM) _ ## SYM
