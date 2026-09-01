@@ -153,7 +153,7 @@ _CRTIMP long __cdecl __MINGW_NOTHROW _findfirst (const char*, struct _finddata_t
 _CRTIMP int __cdecl __MINGW_NOTHROW _findnext (long, struct _finddata_t*);
 _CRTIMP int __cdecl __MINGW_NOTHROW _findclose (long);
 
-#ifndef UNDER_CE
+#if !defined(UNDER_CE) && !defined(__COREDLL__)
 _CRTIMP int __cdecl __MINGW_NOTHROW _chdir (const char*);
 _CRTIMP char* __cdecl __MINGW_NOTHROW _getcwd (char*, int);
 _CRTIMP char* __cdecl __MINGW_NOTHROW _mktemp (char*);
