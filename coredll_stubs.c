@@ -101,6 +101,15 @@ int faccessat(int dirfd, const char *path, int mode, int flags)
   return -1;
 }
 
+/* _getmaxstdio/_setmaxstdio: MSVCRT-compatible answers for gnulib's
+   getdtablesize() (libiconv srclib).  On this CRT an fd *is* a Win32
+   handle (mingwex/wince/open.c) and there is no fd table, so the
+   stdio-table limit is a fiction; the important contract is gnulib's
+   binary search, which probes _setmaxstdio(bound) until it returns -1
+   to discover the upper bound.  Always succeeding (as the previous
+   shim did) makes getdtablesize() report 65536, so fd loops would
+   touch far more descriptors than CE ever has.  Mirror MSVCRT's range
+   (20..2048 on 32-bit) and fail out of range exactly like it does. */
 int _getmaxstdio(void)
 {
   return 512;
@@ -108,8 +117,12 @@ int _getmaxstdio(void)
 
 int _setmaxstdio(int newmax)
 {
-  (void)newmax;
-  return 512;
+  if (newmax < 20 || newmax > 2048)
+    {
+      errno = EINVAL;
+      return -1;
+    }
+  return newmax;
 }
 
 /* On the CE CRT an fd *is* the Win32 handle (mingwex/wince/open.c
