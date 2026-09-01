@@ -5,12 +5,13 @@
 ; USR/coredll.def (-> core_common.def) + crt/corelib1.def.
 ; Parsing policy: ARM retail (x86/PPC/MIPS/SH and DEBUG blocks excluded),
 ; every @CESYSGEN branch included (superset surface: individual devices
-; export only what their OS image was built with), and NONAME
-; (ordinal-only) exports omitted -- they cannot be resolved by a
-; name-based import library.
+; export only what their OS image was built with).  NONAME (ordinal-only)
+; exports are included with their ordinals (Name @n NONAME) so the import
+; library binds by ordinal, exactly like the Microsoft SDK import
+; libraries; a name-based lookup of those would fail at load time.
 ; Verified symbol-for-symbol against a real CE 6.0 device SDK coredll.def
-; (2104 entries, ordinal-only exports excluded on both sides).
-; 2084 name exports.
+; (2104 name entries on the SDK side).
+; 2094 exports total (incl. 11 ordinal-only).
 
 LIBRARY COREDLL
 EXPORTS
@@ -2098,3 +2099,17 @@ wscanf
 wscanf_s
 wsprintfW
 wvsprintfW
+
+; Ordinal-only (NONAME) exports -- imported by ordinal like the Microsoft
+; SDK import libraries.
+DPA_CreateEx @1838 NONAME
+DPA_Clone @1839 NONAME
+DPA_DeleteAllPtrs @1840 NONAME
+DPA_DeletePtr @1841 NONAME
+DPA_GetPtrIndex @1846 NONAME
+DPA_Search @1849 NONAME
+DSA_Grow @1861 NONAME
+DSA_SetRange @1865 NONAME
+DSA_Sort @1866 NONAME
+RtlDispatchException @2548 NONAME
+UserCallWindowProc @2867 NONAME
