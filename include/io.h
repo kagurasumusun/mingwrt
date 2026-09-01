@@ -270,6 +270,10 @@ _CRTIMP int __cdecl __MINGW_NOTHROW _open (const char*, int, ...);
 #ifndef __COREDLL__
 _CRTIMP int __cdecl __MINGW_NOTHROW _open_osfhandle (intptr_t, int);
 _CRTIMP int __cdecl __MINGW_NOTHROW _pipe (int *, unsigned int, int);
+#else
+/* fd handles do not exist on COREDLL; resolves to the coredll_stubs.o
+   shim (gnulib's fcntl dup path references it). */
+intptr_t __cdecl _open_osfhandle (intptr_t, int);
 #endif /* __COREDLL__ */
 _CRTIMP int __cdecl __MINGW_NOTHROW _read (int, void*, unsigned int);
 /* _setmode is exported by COREDLL (coredll*.def) even though there is no

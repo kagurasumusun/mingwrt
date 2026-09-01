@@ -75,6 +75,14 @@ int _getmaxstdio(void)
   return 512;
 }
 
+intptr_t _open_osfhandle(intptr_t osfhandle, int flags)
+{
+  (void)osfhandle;
+  (void)flags;
+  errno = EMFILE;
+  return -1;
+}
+
 /* Low-level fd I/O: COREDLL only offers stdio and the Win32 handle API,
    so an fd table does not exist.  The shims fail with EBADF/ENOENT. */
 
