@@ -7,11 +7,34 @@
 #ifdef __COREDLL__
 
 #include <sys/stat.h>
+#include <windows.h>
 
-int* _errno()
+/* COREDLL has no _errno export, so the CRT must provide errno storage.
+   Use a per-thread slot rather than a single static int: a shared
+   errno would corrupt across threads in any multithreaded CE program.
+   The slot comes from TlsAlloc (which kfuncs.h maps to the CE-SDK
+   TlsCall(TLS_FUNCALLOC, 0) idiom, present on every CE generation) and
+   the 4-byte cell is LocalAlloc'ed on first use per thread; like the
+   other static buffers in this file it is never freed. */
+int* _errno(void)
 {
-  static int e = 0;
-  return &e;
+  static DWORD slot = (DWORD)-1;   /* TLS_OUT_OF_INDEXES */
+  int *p;
+
+  if (slot == (DWORD)-1)
+    slot = TlsAlloc ();
+  p = (int *) TlsGetValue (slot);
+  if (p == NULL)
+    {
+      p = (int *) LocalAlloc (LPTR, sizeof (int));
+      if (p == NULL)
+        {
+          static int oom;
+          return &oom;
+        }
+      TlsSetValue (slot, p);
+    }
+  return p;
 }
 
 char* setlocale(int category, const char *locale)
@@ -92,50 +115,12 @@ intptr_t _open_osfhandle(intptr_t osfhandle, int flags)
   return -1;
 }
 
-/* Low-level fd I/O: COREDLL only offers stdio and the Win32 handle API,
-   so an fd table does not exist.  The shims fail with EBADF/ENOENT. */
-
-int _open(const char *path, int flags, ...)
-{
-  (void)path;
-  (void)flags;
-  errno = ENOENT;
-  return -1;
-}
-
-int _close(int fd)
-{
-  (void)fd;
-  errno = EBADF;
-  return -1;
-}
-
-int _read(int fd, void *buf, unsigned int count)
-{
-  (void)fd;
-  (void)buf;
-  (void)count;
-  errno = EBADF;
-  return -1;
-}
-
-int _write(int fd, const void *buf, unsigned int count)
-{
-  (void)fd;
-  (void)buf;
-  (void)count;
-  errno = EBADF;
-  return -1;
-}
-
-long _lseek(int fd, long offset, int whence)
-{
-  (void)fd;
-  (void)offset;
-  (void)whence;
-  errno = EBADF;
-  return -1;
-}
+/* The low-level fd surface (_open/_close/_read/_write/_lseek and their
+   POSIX spellings) is implemented for real by
+   mingwex/wince/{open,close,read,write,lseek}.c (Win32-handle based);
+   EBADF shims here would shadow those implementations for the
+   underscored names and duplicate their symbols when both spellings
+   are referenced, so none are defined in this file. */
 
 int _isatty(int fd)
 {
@@ -186,8 +171,8 @@ int __cdecl raise(int sig)
   return -1;
 }
 
-unsigned long __cdecl GetModuleFileNameA(void *hModule, char *lpFilename,
-                                         unsigned long nSize)
+DWORD WINAPI GetModuleFileNameA(HINSTANCE hModule, LPSTR lpFilename,
+                                DWORD nSize)
 {
   (void)hModule;
   if (nSize > 0 && lpFilename)
@@ -199,7 +184,7 @@ unsigned long __cdecl GetModuleFileNameA(void *hModule, char *lpFilename,
    route between handle-based and path-based probing; COREDLL does not
    export it.  FILE_TYPE_UNKNOWN (0) sends callers down their path-based
    fallback, which is what the shims above serve. */
-unsigned long __cdecl GetFileType(void *hFile)
+DWORD WINAPI GetFileType(HANDLE hFile)
 {
   (void)hFile;
   return 0;
@@ -212,7 +197,7 @@ unsigned long __cdecl GetFileType(void *hFile)
    COREDLL export (mapped from the plain GetProcAddress name by
    winbase.h, exactly like the Microsoft SDKs), so it deliberately has
    no shim here. */
-void * __cdecl LoadLibraryA(const char *lpLibFileName)
+HMODULE WINAPI LoadLibraryA(LPCSTR lpLibFileName)
 {
   (void)lpLibFileName;
   return 0;
