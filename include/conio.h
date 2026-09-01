@@ -22,7 +22,14 @@ extern "C" {
 #endif
 
 #ifdef __COREDLL__
-# include_next <conio.h>
+/* CeGCC pairs this header with the COREDLL runtime's own conio.h further
+   down the include path.  A sysroot assembled from this tree alone has
+   nothing after us, so include the next header only when one exists and
+   fall through to the (deliberately empty on COREDLL) declarations below.
+   Same pattern as direct.h / float.h. */
+# if defined(__has_include_next) && __has_include_next(<conio.h>)
+#  include_next <conio.h>
+# endif
 #else
 
 _CRTIMP char* __cdecl __MINGW_NOTHROW	_cgets (char*);
