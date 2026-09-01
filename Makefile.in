@@ -261,6 +261,7 @@ MOLD_OBJS = isascii.o iscsym.o iscsymf.o toascii.o \
 
 ifneq (,$(findstring mingw32ce,$(target_alias)))
 LIBS = libcoredll.a libcoredll3.a libcoredll4.a libcoredll6.a \
+       libcoredll7.a libcoredll8.a \
        libmingw32.a \
        libceoldname.a \
        $(LIBM_A) \
