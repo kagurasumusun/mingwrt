@@ -77,6 +77,19 @@ struct tm
 #define _TM_DEFINED
 #endif
 
+/* POSIX struct timespec (IEEE Std 1003.1b).  libc++'s <filesystem>
+   (the POSIX path, which is the only one available on WinCE) refers to
+   ::timespec as a class type and to st_mtim/st_atim/st_ctim members of
+   struct stat, so this must be defined as an aggregate here. */
+#ifndef _TIMESPEC_DEFINED
+#define _TIMESPEC_DEFINED
+struct timespec
+{
+	time_t	tv_sec;		/* Seconds */
+	long	tv_nsec;	/* Nanoseconds */
+};
+#endif
+
 #ifdef	__cplusplus
 extern "C" {
 #endif

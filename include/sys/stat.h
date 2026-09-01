@@ -22,6 +22,10 @@
 #endif /* Not RC_INVOKED */
 
 #include <sys/types.h>
+#ifdef __COREDLL__
+/* POSIX struct timespec for the st_atim/st_mtim/st_ctim mirrors. */
+#include <time.h>
+#endif
 
 /*
  * Constants for the stat st_mode member.
@@ -33,6 +37,8 @@
 #define	_S_IFREG	0x8000	/* Regular */
 
 #define	_S_IFMT		0xF000	/* File type mask */
+#define	_S_IFLNK	0xA000	/* Symbolic link (POSIX; never set on CE) */
+#define	_S_IFSOCK	0xC000	/* Socket (POSIX; never set on CE) */
 
 #define	_S_IEXEC	0x0040
 #define	_S_IWRITE	0x0080
@@ -48,6 +54,8 @@
 #define	_S_ISCHR(m)	(((m) & _S_IFMT) == _S_IFCHR)
 #define	_S_ISBLK(m)	(((m) & _S_IFMT) == _S_IFBLK)
 #define	_S_ISREG(m)	(((m) & _S_IFMT) == _S_IFREG)
+#define	_S_ISLNK(m)	(((m) & _S_IFMT) == _S_IFLNK)
+#define	_S_ISSOCK(m)	(((m) & _S_IFMT) == _S_IFSOCK)
 
 #ifndef _NO_OLDNAMES
 
@@ -56,6 +64,8 @@
 #define	S_IFBLK		_S_IFBLK
 #define	S_IFDIR		_S_IFDIR
 #define	S_IFREG		_S_IFREG
+#define	S_IFLNK		_S_IFLNK
+#define	S_IFSOCK	_S_IFSOCK
 #define	S_IFMT		_S_IFMT
 #define	S_IEXEC		_S_IEXEC
 #define	S_IWRITE	_S_IWRITE
@@ -70,6 +80,8 @@
 #define	S_ISCHR(m)	(((m) & S_IFMT) == S_IFCHR)
 #define	S_ISBLK(m)	(((m) & S_IFMT) == S_IFBLK)
 #define	S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)
+#define	S_ISLNK(m)	(((m) & S_IFMT) == S_IFLNK)
+#define	S_ISSOCK(m)	(((m) & S_IFMT) == S_IFSOCK)
 
 #endif	/* Not _NO_OLDNAMES */
 
@@ -97,6 +109,11 @@ struct _stat
 				 * on FAT) */
 	time_t	st_mtime;	/* Modified time */
 	time_t	st_ctime;	/* Creation time */
+#ifdef __COREDLL__
+	struct timespec st_atim;
+	struct timespec st_mtim;
+	struct timespec st_ctim;
+#endif
 };
 
 #ifndef	_NO_OLDNAMES
@@ -115,6 +132,11 @@ struct stat
 				 * on FAT) */
 	time_t	st_mtime;	/* Modified time */
 	time_t	st_ctime;	/* Creation time */
+#ifdef __COREDLL__
+	struct timespec st_atim;
+	struct timespec st_mtim;
+	struct timespec st_ctim;
+#endif
 };
 #endif /* _NO_OLDNAMES */
 
@@ -191,6 +213,11 @@ _CRTIMP int __cdecl __MINGW_NOTHROW _wstat64 (const wchar_t*, struct __stat64*);
    shims in libmingw32.a (gnulib maps stat/fstat to the _stati64 pair). */
 int __cdecl  _fstati64 (int, struct _stati64 *);
 int __cdecl  _stati64 (const char *, struct _stati64 *);
+/* POSIX lstat: COREDLL has no symlinks, so lstat is stat with the
+   caller's struct stat (mingwex/wince/stat.c). */
+#ifndef _NO_OLDNAMES
+int __cdecl lstat (const char *, struct stat *);
+#endif
 #endif
 
 #ifdef	__cplusplus

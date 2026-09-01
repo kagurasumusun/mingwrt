@@ -42,6 +42,13 @@ struct timezone
 int __cdecl __MINGW_NOTHROW gettimeofday(struct timeval *__restrict__,
 			 void *__restrict__  /*	tzp (unused) */);
 
+#ifdef __COREDLL__
+/* POSIX utimes (libc++ <filesystem> __last_write_time).  COREDLL has
+   no SetFileTime-by-path API, so mingwex/wince/utimes.c implements it
+   via CreateFileW + SetFileTime. */
+int __cdecl __MINGW_NOTHROW utimes (const char *path, const struct timeval times[2]);
+#endif
+
 #ifdef	__cplusplus
 }
 #endif

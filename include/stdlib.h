@@ -575,6 +575,19 @@ _CRTIMP char* __cdecl __MINGW_NOTHROW	gcvt (double, int, char*);
 
 #endif	/* Not __STRICT_ANSI__ */
 
+#ifdef __COREDLL__
+/* POSIX realpath.  Deliberately outside the __STRICT_ANSI__ blocks
+   above: C++ always defines __STRICT_ANSI__, and libc++ <filesystem>
+   (POSIX path) needs ::realpath.  COREDLL exports no path-resolution
+   API (GetFullPathName is absent from every CE 4.x/5.x/6.x def), so
+   mingwex/wince/realpath.c fails honestly with errno = ENOENT;
+   libc++ weakens realpath to its absolute_path fallback. */
+#ifndef _NO_OLDNAMES
+char *__cdecl __MINGW_NOTHROW realpath (const char *__restrict__,
+					char *__restrict__);
+#endif
+#endif
+
 /* C99 names */
 
 #if !defined __NO_ISOCEXT /* externs in static libmingwex.a */

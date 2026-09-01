@@ -73,6 +73,9 @@
 #define	EOVERFLOW	75	/* Value too large */
 #define	ECONNREFUSED	107	/* Connection refused */
 #define	EMSGSIZE	115	/* Message size */
+/* POSIX additions needed by libc++ <filesystem> (error_code mapping). */
+#define	EOPNOTSUPP	95	/* Operation not supported on socket */
+#define	ENOTSUP		EOPNOTSUPP
 
 /*
  * NOTE: ENAMETOOLONG and ENOTEMPTY conflict with definitions in the

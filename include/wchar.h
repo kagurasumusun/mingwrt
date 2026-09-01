@@ -415,6 +415,11 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	  _wrmdir (const wchar_t*);
 #endif /* _WDIRECT_DEFINED */
 
 #ifndef _STAT_DEFINED
+#ifdef __COREDLL__
+/* For struct timespec in the struct _stat/stat mirrors below (must
+   stay identical to sys/stat.h's copies, same _STAT_DEFINED guard). */
+#include <time.h>
+#endif
 /*
  * The structure manipulated and returned by stat and fstat.
  *
@@ -436,6 +441,11 @@ struct _stat
 				 * on FAT) */
 	time_t	st_mtime;	/* Modified time */
 	time_t	st_ctime;	/* Creation time */
+#ifdef __COREDLL__
+	struct timespec st_atim;
+	struct timespec st_mtim;
+	struct timespec st_ctim;
+#endif
 };
 
 #ifndef	_NO_OLDNAMES
@@ -454,6 +464,11 @@ struct stat
 				 * on FAT) */
 	time_t	st_mtime;	/* Modified time */
 	time_t	st_ctime;	/* Creation time */
+#ifdef __COREDLL__
+	struct timespec st_atim;
+	struct timespec st_mtim;
+	struct timespec st_ctim;
+#endif
 };
 #endif /* _NO_OLDNAMES */
 

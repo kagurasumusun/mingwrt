@@ -81,7 +81,11 @@ typedef long long  intmax_t;
 typedef unsigned long long uintmax_t;
 
 /* 7.18.2  Limits of specified-width integer types */
-#if !defined ( __cplusplus) || defined (__STDC_LIMIT_MACROS)
+/* C++11 and later require <cstdint> to provide these macros
+   unconditionally; libc++ (this tree's C++ runtime) does not define
+   __STDC_LIMIT_MACROS, so the C++98-era opt-in is kept only for older
+   compilers. */
+#if !defined ( __cplusplus) || (__cplusplus >= 201103L) || defined (__STDC_LIMIT_MACROS)
 
 /* 7.18.2.1  Limits of exact-width integer types */
 #define INT8_MIN (-128) 
@@ -172,7 +176,8 @@ typedef unsigned long long uintmax_t;
 
 
 /* 7.18.4  Macros for integer constants */
-#if !defined ( __cplusplus) || defined (__STDC_CONSTANT_MACROS)
+/* See the 7.18.2 note: C++11+ gets these unconditionally. */
+#if !defined ( __cplusplus) || (__cplusplus >= 201103L) || defined (__STDC_CONSTANT_MACROS)
 
 /* 7.18.4.1  Macros for minimum-width integer constants
 

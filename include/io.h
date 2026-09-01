@@ -191,19 +191,21 @@ _CRTIMP int __cdecl __MINGW_NOTHROW chdir (const char*);
 _CRTIMP char* __cdecl __MINGW_NOTHROW getcwd (char*, int);
 _CRTIMP char* __cdecl __MINGW_NOTHROW mktemp (char*);
 #else
-static inline int chdir(const char *path)
-{
-	(void)path;
-	return -1;
-}
-static inline char *getcwd(char *buf, size_t size)
-{
-	(void)buf;
-	(void)size;
-	return 0;
-}
+/* On CE, coredll_stubs.o provides _chdir/_getcwd (they fail cleanly:
+   COREDLL has no working-directory API).  The plain names below are
+   the POSIX ones libc++ <filesystem> calls. */
+_CRTIMP int __cdecl __MINGW_NOTHROW chdir (const char*);
+_CRTIMP char* __cdecl __MINGW_NOTHROW getcwd (char*, size_t);
+_CRTIMP char* __cdecl __MINGW_NOTHROW mktemp (char*);
 #endif
+#ifdef __COREDLL__
+/* POSIX mkdir takes a mode (libc++ <filesystem> calls
+   detail::mkdir(p, st_mode)).  The mode is ignored on CE (no
+   permissions), but the two-argument signature is required. */
+_CRTIMP int __cdecl __MINGW_NOTHROW mkdir (const char*, mode_t);
+#else
 _CRTIMP int __cdecl __MINGW_NOTHROW mkdir (const char*);
+#endif
 _CRTIMP int __cdecl __MINGW_NOTHROW rmdir (const char*);
 _CRTIMP int __cdecl __MINGW_NOTHROW chmod (const char*, int);
 #endif /* _UWIN */
@@ -292,6 +294,8 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	remove (const char*);
    coredll_stubs.o shims in libmingw32.a. */
 int __cdecl _chdir (const char*);
 char* __cdecl _getcwd (char*, size_t);
+/* 64-bit seek (mingwex/wince/lseeki64.c via SetFilePointerEx). */
+_CRTIMP __int64 __cdecl __MINGW_NOTHROW _lseeki64 (int, __int64, int);
 /* gnulib's canonicalize-lgpl probes path components through faccessat. */
 int __cdecl faccessat (int, const char*, int, int);
 #endif
