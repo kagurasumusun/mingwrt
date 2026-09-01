@@ -527,13 +527,17 @@ _invalid_parameter_handler _set_invalid_parameter_handler (_invalid_parameter_ha
 #endif /* __MSVCRT__ */
 
 #ifdef __COREDLL__
-/* COREDLL exports _set_invalid_parameter_handler; gnulib's msvc-inval.c
-   (libiconv srclib) reaches it through <stdlib.h>, the same header the
-   MSVCRT build declares it in. */
-# ifndef _UINTPTR_T_DEFINED
-#  define _UINTPTR_T_DEFINED
+/* Only CE 6.0 exports _set_invalid_parameter_handler/_get_invalid_parameter_handler
+   (ordinals 2697/2698 in the CE 6.0 and CE 7 surfaces; absent from the
+   CE 4.x and CE 5.0 COREDLL), so declare them only where they exist,
+   matching the real SDKs.  gnulib's msvc-inval.c (libiconv srclib)
+   reaches them through <stdlib.h>, the same header the MSVCRT build
+   declares them in. */
+# if defined (_WIN32_WCE) && (_WIN32_WCE >= 0x600)
+#  ifndef _UINTPTR_T_DEFINED
+#   define _UINTPTR_T_DEFINED
 typedef unsigned int uintptr_t;
-# endif
+#  endif
 typedef void
 (* _invalid_parameter_handler) (
     const wchar_t *,
@@ -542,7 +546,9 @@ typedef void
     unsigned int,
     uintptr_t);
 _invalid_parameter_handler _set_invalid_parameter_handler (_invalid_parameter_handler);
-#endif
+_invalid_parameter_handler _get_invalid_parameter_handler (void);
+# endif /* _WIN32_WCE >= 0x600 */
+#endif /* __COREDLL__ */
 
 #if defined(__MSVCRT__) || defined (__COREDLL__)
 _CRTIMP unsigned int __cdecl __MINGW_NOTHROW _rotl(unsigned int, int) __MINGW_ATTRIB_CONST;
