@@ -228,4 +228,11 @@ void * __cdecl GetProcAddressW(void *hModule, const wchar_t *lpProcName)
   return 0;
 }
 
+void * __cdecl GetProcAddress(void *hModule, const char *lpProcName)
+{
+  (void)hModule;
+  (void)lpProcName;
+  return 0;
+}
+
 #endif
