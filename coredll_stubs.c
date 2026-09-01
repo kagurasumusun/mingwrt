@@ -70,6 +70,25 @@ int _chdir(const char *path)
   return -1;
 }
 
+/* POSIX names: libc++ <filesystem> (posix_compat.h) does
+   `using ::chdir; using ::getcwd;` and operations.cpp calls
+   detail::chdir()/detail::getcwd().  COREDLL has no CWD API, so these
+   fail cleanly exactly like the _-prefixed versions above. */
+char *getcwd(char *buf, size_t size)
+{
+  (void)buf;
+  (void)size;
+  errno = ENOENT;
+  return 0;
+}
+
+int chdir(const char *path)
+{
+  (void)path;
+  errno = ENOENT;
+  return -1;
+}
+
 /* gnulib's canonicalize-lgpl probes path components through faccessat
    (its __faccessat maps there on _WIN32). */
 int faccessat(int dirfd, const char *path, int mode, int flags)

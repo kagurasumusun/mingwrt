@@ -57,8 +57,12 @@ _CRTIMP int __cdecl __MINGW_NOTHROW isspace(int);
 _CRTIMP int __cdecl __MINGW_NOTHROW isupper(int);
 _CRTIMP int __cdecl __MINGW_NOTHROW isxdigit(int);
 
-#if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
-     || !defined __STRICT_ANSI__
+#if defined(__cplusplus) || \
+    (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || \
+     !defined __STRICT_ANSI__
+/* libc++ <cctype> does `using ::isblank _LIBCPP_USING_IF_EXISTS` and the
+   <filesystem> locale path instantiates std::isblank(_CharT, locale);
+   keep isblank visible in C++ even though it is a C99 name. */
 int __cdecl __MINGW_NOTHROW isblank (int);
 #endif
 
@@ -180,8 +184,9 @@ __CRT_INLINE int __cdecl __MINGW_NOTHROW isspace(int c) {return __ISCTYPE(c, _SP
 __CRT_INLINE int __cdecl __MINGW_NOTHROW isupper(int c) {return __ISCTYPE(c, _UPPER);}
 __CRT_INLINE int __cdecl __MINGW_NOTHROW isxdigit(int c) {return __ISCTYPE(c, _HEX);}
 
-#if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
-     || !defined __STRICT_ANSI__
+#if defined(__cplusplus) || \
+    (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || \
+     !defined __STRICT_ANSI__
 __CRT_INLINE int __cdecl __MINGW_NOTHROW isblank (int c)
   {return (__ISCTYPE(c, _BLANK) || c == '\t');}
 #endif

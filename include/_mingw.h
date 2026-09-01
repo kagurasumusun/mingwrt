@@ -262,6 +262,12 @@
 # ifndef _UNICODE
 #  define _UNICODE
 # endif
+# ifndef __WINCE__
+/* libc++ (this tree's fork) selects its WinCE locale backend
+   (__locale_dir/support/wince.h) on __WINCE__; the historical CeGCC
+   driver predefined it. */
+#  define __WINCE__ 1
+# endif
 #endif
 
 #if defined(UNDER_CE) && defined(__arm__)

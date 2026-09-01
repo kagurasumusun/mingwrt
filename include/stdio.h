@@ -205,6 +205,11 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	fclose (FILE*);
 #ifndef __COREDLL__
 /* MS puts remove & rename (but not wide versions) in io.h  also */
 _CRTIMP int __cdecl __MINGW_NOTHROW	remove (const char*);
+#else
+/* COREDLL exports neither remove nor any file API under that name;
+   mingwex/wince/remove.c supplies remove as the unlink wrapper that
+   POSIX and libc++ <filesystem> require. */
+_CRTIMP int __cdecl __MINGW_NOTHROW	remove (const char*);
 #endif
 _CRTIMP int __cdecl __MINGW_NOTHROW	rename (const char*, const char*);
 #ifndef __COREDLL__
@@ -644,6 +649,12 @@ __CRT_INLINE off64_t __cdecl __MINGW_NOTHROW ftello64 (FILE * stream)
 #endif /* __NO_MINGW_LFS */
 
 #endif	/* Not __STRICT_ANSI__ */
+#if defined(__COREDLL__) && defined(__cplusplus) && !defined(_NO_OLDNAMES)
+/* libc++ <fstream> basic_filebuf::__open(int) calls fdopen(); the POSIX
+   block above is gated on !__STRICT_ANSI__ (always set in C++).  CE has
+   the mingwex/wince/fdopen.c implementation. */
+_CRTIMP FILE* __cdecl __MINGW_NOTHROW fdopen (int, const char*);
+#endif
 
 /* Wide  versions */
 
