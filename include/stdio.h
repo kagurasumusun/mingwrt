@@ -469,11 +469,15 @@ _CRTIMP size_t __cdecl __MINGW_NOTHROW	fwrite (const void*, size_t, size_t, FILE
 
 _CRTIMP int __cdecl __MINGW_NOTHROW	fseek (FILE*, long, int);
 _CRTIMP long __cdecl __MINGW_NOTHROW	ftell (FILE*);
+#ifdef __COREDLL__
 /* POSIX spellings used by libc++'s <fstream>; on CE the CRT is 32-bit
    offsets only, so they are fseek/ftell (off_t is long here).  Shims live
-   in coredll_stubs.o. */
+   in coredll_stubs.o.  (Not declared for the desktop CRT: this tree has
+   no fseeko/ftello implementation outside COREDLL, so a declaration
+   there would only produce link errors.) */
 int __cdecl __MINGW_NOTHROW	fseeko (FILE*, long, int);
 long __cdecl __MINGW_NOTHROW	ftello (FILE*);
+#endif
 #ifndef __COREDLL__
 _CRTIMP void __cdecl __MINGW_NOTHROW	rewind (FILE*);
 #endif
