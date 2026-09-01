@@ -7,25 +7,26 @@
  *
  * Written by Pedro Alves <pedro_alves@portugalmail.pt> Feb 2007
  *
+ * The original implementation delegated to _wfdopen().  That is only
+ * correct on Windows Mobile 6 and later: the CE 4.x/5.x shared-source
+ * coredll defs have no _wf* stream functions, so an import of
+ * _wfdopen makes the whole executable fail to load on CE 5.0 devices.
+ * The FILE structure is opaque on this CRT (stdio.h typedefs FILE as
+ * void under __COREDLL__), so there is no portable way to wrap an fd
+ * into a FILE* ourselves.  Fail honestly instead: libc++ <filesystem>
+ * only reaches this via basic_filebuf::__open(int), which it never
+ * calls (it opens files by path), so returning NULL costs nothing in
+ * that path and keeps CE 5.0 executables loadable.
  */
 
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-#define MAX_MODE 64
 
 FILE *
 _fdopen (int fildes, const char *mode)
 {
-  FILE *f;
-  wchar_t wmode[MAX_MODE];
-  size_t sizem = strlen (mode) + 1;
-  if (sizem > MAX_MODE)
-    return NULL;
-  mbstowcs (wmode, mode, sizem);
-  f = _wfdopen (fildes, wmode);
-  return f;
+  (void) fildes;
+  (void) mode;
+  return NULL;
 }
 
 FILE *
