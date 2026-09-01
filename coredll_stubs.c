@@ -205,7 +205,7 @@ unsigned long __cdecl GetFileType(void *hFile)
   return 0;
 }
 
-/* COREDLL exports LoadLibraryW only (every CE 3.0-8 def and every real
+/* COREDLL exports LoadLibraryW only (every CE 4.x/5.x/6.x def and every real
    device SDK import lib agrees); the gnulib code that probes for
    optional desktop DLLs calls LoadLibraryA, so fail cleanly with a NULL
    module handle, which its callers check.  GetProcAddressW *is* a real
