@@ -272,8 +272,13 @@ _CRTIMP int __cdecl __MINGW_NOTHROW _open_osfhandle (intptr_t, int);
 _CRTIMP int __cdecl __MINGW_NOTHROW _pipe (int *, unsigned int, int);
 #endif /* __COREDLL__ */
 _CRTIMP int __cdecl __MINGW_NOTHROW _read (int, void*, unsigned int);
-#ifndef __COREDLL__
+/* _setmode is exported by COREDLL (coredll*.def) even though there is no
+   text-mode translation on CE; the old header hid it under __COREDLL__,
+   which made gnulib's binary-io.h (libiconv srclib, cellvm-build Stage 5)
+   fail with an implicit _setmode call.  Keep it declared; the undecorated
+   setmode below stays hidden (COREDLL does not export it). */
 _CRTIMP int __cdecl __MINGW_NOTHROW _setmode (int, int);
+#ifndef __COREDLL__
 /* MS puts remove & rename (but not wide versions) in io.h as well
    as in stdio.h. */
 _CRTIMP int __cdecl __MINGW_NOTHROW	remove (const char*);
