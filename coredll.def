@@ -11,7 +11,12 @@
 ; Augmented with the Windows Mobile 6 Professional SDK coredll.lib name
 ; exports (C++-mangled IME internals, enhanced-metafile helpers and the
 ; WM6/QFE-era additions).
-; 1938 exports total (incl. 9 ordinal-only).
+; Restored the CE 5.0 surface the single-device dump was missing
+; (TlsAlloc/TlsFree per MSDN "TlsAlloc (Windows CE 5.0)", plus the
+; pre-k.coredll loader/devload exports CloseAllDeviceHandles,
+; SetWDevicePowerHandler, SystemStarted, ThreadAttachAllDLLs and
+; ThreadDetachAllDLLs: CE 5.0 kept these in the single coredll).
+; 1946 exports total (incl. 9 ordinal-only).
 
 LIBRARY COREDLL
 EXPORTS
@@ -491,6 +496,7 @@ clearerr
 ClearEventLogW
 ClientToScreen
 ClipCursor
+CloseAllDeviceHandles
 CloseAllFileHandles
 CloseAllServiceHandles
 CloseClipboard
@@ -1655,6 +1661,7 @@ SetUserDefaultLCID
 SetUserDefaultUILanguage
 setvbuf
 SetViewportOrgEx
+SetWDevicePowerHandler
 SetWindowLongW
 SetWindowOrgEx
 SetWindowPos
@@ -1796,6 +1803,7 @@ swscanf
 SystemIdleTimerReset
 SystemMemoryLow
 SystemParametersInfoW
+SystemStarted
 SystemTimeToFileTime
 TakeCritSec
 tan
@@ -1804,9 +1812,13 @@ TerminateProcess
 TerminateThread
 THCreateSnapshot
 THGrow
+ThreadAttachAllDLLs
 ThreadBaseFunc
+ThreadDetachAllDLLs
 ThreadExceptionExit
+TlsAlloc
 TlsCall
+TlsFree
 TlsGetValue
 TlsSetValue
 tolower
