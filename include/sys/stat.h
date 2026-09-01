@@ -172,13 +172,6 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	stat (const char*, struct stat*);
 #if defined (__MSVCRT__)
 _CRTIMP int __cdecl __MINGW_NOTHROW  _fstati64(int, struct _stati64 *);
 _CRTIMP int __cdecl __MINGW_NOTHROW  _stati64(const char *, struct _stati64 *);
-#endif
-#ifdef __COREDLL__
-/* No file metadata on COREDLL; these resolve to the coredll_stubs.o
-   shims in libmingw32.a (gnulib maps stat/fstat to the _stati64 pair). */
-int __cdecl  _fstati64 (int, struct _stati64 *);
-int __cdecl  _stati64 (const char *, struct _stati64 *);
-#endif
 /* These require newer versions of msvcrt.dll (6.10 or higher).  */ 
 #if __MSVCRT_VERSION__ >= 0x0601
 _CRTIMP int __cdecl __MINGW_NOTHROW _fstat64 (int, struct __stat64*);
@@ -193,6 +186,12 @@ _CRTIMP int __cdecl __MINGW_NOTHROW _wstat64 (const wchar_t*, struct __stat64*);
 #define _WSTAT_DEFINED
 #endif /* _WSTAT_DEFIND */
 #endif /* __MSVCRT__ */
+#ifdef __COREDLL__
+/* No file metadata on COREDLL; these resolve to the coredll_stubs.o
+   shims in libmingw32.a (gnulib maps stat/fstat to the _stati64 pair). */
+int __cdecl  _fstati64 (int, struct _stati64 *);
+int __cdecl  _stati64 (const char *, struct _stati64 *);
+#endif
 
 #ifdef	__cplusplus
 }
