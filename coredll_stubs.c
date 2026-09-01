@@ -201,4 +201,31 @@ unsigned long __cdecl GetModuleFileNameA(void *hModule, char *lpFilename,
   return 0;
 }
 
+/* gnulib's stat-w32 (libiconv srclib) calls GetFileType on every stat to
+   route between handle-based and path-based probing; COREDLL does not
+   export it.  FILE_TYPE_UNKNOWN (0) sends callers down their path-based
+   fallback, which is what the shims above serve. */
+unsigned long __cdecl GetFileType(void *hFile)
+{
+  (void)hFile;
+  return 0;
+}
+
+/* The Vista-era loader probing (LoadLibraryA/GetProcAddressW, declared by
+   w32api but absent from COREDLL) is only reached when the gnulib code
+   thinks dynamic resolution is possible; a NULL module handle keeps the
+   function pointers it feeds NULL, which every caller checks. */
+void * __cdecl LoadLibraryA(const char *lpLibFileName)
+{
+  (void)lpLibFileName;
+  return 0;
+}
+
+void * __cdecl GetProcAddressW(void *hModule, const wchar_t *lpProcName)
+{
+  (void)hModule;
+  (void)lpProcName;
+  return 0;
+}
+
 #endif
