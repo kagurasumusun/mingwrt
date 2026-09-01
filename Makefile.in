@@ -260,8 +260,7 @@ MOLD_OBJS = isascii.o iscsym.o iscsymf.o toascii.o \
 	strcasecmp.o strncasecmp.o wcscmpi.o
 
 ifneq (,$(findstring mingw32ce,$(target_alias)))
-LIBS = libcoredll.a libcoredll3.a libcoredll4.a libcoredll6.a \
-       libcoredll7.a libcoredll8.a \
+LIBS = libcoredll.a libcoredll4.a libcoredll6.a \
        libmingw32.a \
        libceoldname.a \
        $(LIBM_A) \
@@ -627,11 +626,8 @@ force:
 # Dependencies
 #
 libcoredll.a: coredll.def
-libcoredll3.a: coredll3.def
 libcoredll4.a: coredll4.def
 libcoredll6.a: coredll6.def
-libcoredll7.a: coredll7.def
-libcoredll8.a: coredll8.def
 libcrtdll.a: crtdll.def
 libmsvcrt.a: msvcrt.def
 libmsvcrtd.a: msvcrtd.def
