@@ -158,4 +158,47 @@ int _dup2(int fd1, int fd2)
   return -1;
 }
 
+/* COREDLL has no strerror, signal machinery, or process/module queries
+   used by gnulib's error/sigprocmask/raise/progreloc/dup2/fcntl (libiconv
+   srclib, Stage 5).  The shims below keep those references resolvable and
+   degrade the way the platform actually behaves: signals do not exist,
+   the program path is unavailable, and the pseudo process handle is the
+   usual -1. */
+
+char *strerror(int errnum)
+{
+  static char buf[32];
+  sprintf(buf, "Unknown error %d", errnum);
+  return buf;
+}
+
+__p_sig_fn_t __cdecl signal(int sig, __p_sig_fn_t handler)
+{
+  (void)sig;
+  (void)handler;
+  errno = EINVAL;
+  return SIG_ERR;
+}
+
+int __cdecl raise(int sig)
+{
+  (void)sig;
+  errno = EINVAL;
+  return -1;
+}
+
+void * __cdecl GetCurrentProcess(void)
+{
+  return (void *)-1;
+}
+
+unsigned long __cdecl GetModuleFileNameA(void *hModule, char *lpFilename,
+                                         unsigned long nSize)
+{
+  (void)hModule;
+  if (nSize > 0 && lpFilename)
+    lpFilename[0] = 0;
+  return 0;
+}
+
 #endif
