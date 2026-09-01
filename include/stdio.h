@@ -230,9 +230,9 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	unlink (const char*);
 
 _CRTIMP int __cdecl __MINGW_NOTHROW	setvbuf (FILE*, char*, int, size_t);
 
-#ifndef __COREDLL__
+/* setbuf resolves to the coredll_stubs.o shim on COREDLL (COREDLL itself
+   has no export; it forwards to setvbuf). */
 _CRTIMP void __cdecl __MINGW_NOTHROW	setbuf (FILE*, char*);
-#endif
 
 /*
  * Formatted Output
@@ -469,6 +469,10 @@ _CRTIMP size_t __cdecl __MINGW_NOTHROW	fwrite (const void*, size_t, size_t, FILE
 
 _CRTIMP int __cdecl __MINGW_NOTHROW	fseek (FILE*, long, int);
 _CRTIMP long __cdecl __MINGW_NOTHROW	ftell (FILE*);
+/* POSIX spellings used by libc++'s <fstream>; on CE the CRT is 32-bit
+   offsets only, so they are fseek/ftell.  coredll_stubs.o shims. */
+int __cdecl __MINGW_NOTHROW	fseeko (FILE*, off_t, int);
+off_t __cdecl __MINGW_NOTHROW	ftello (FILE*);
 #ifndef __COREDLL__
 _CRTIMP void __cdecl __MINGW_NOTHROW	rewind (FILE*);
 #endif

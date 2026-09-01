@@ -235,4 +235,21 @@ void * __cdecl GetProcAddress(void *hModule, const char *lpProcName)
   return 0;
 }
 
+/* libc++'s <fstream> uses the POSIX spellings; CE has 32-bit offsets. */
+
+void setbuf(FILE *f, char *buf)
+{
+  setvbuf(f, buf, buf != 0 ? _IOFBF : _IONBF, BUFSIZ);
+}
+
+int fseeko(FILE *f, off_t offset, int whence)
+{
+  return fseek(f, (long)offset, whence);
+}
+
+off_t ftello(FILE *f)
+{
+  return (off_t)ftell(f);
+}
+
 #endif
