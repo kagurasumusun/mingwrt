@@ -571,6 +571,11 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	_fcloseall (void);
 _CRTIMP int __cdecl __MINGW_NOTHROW	_getmaxstdio (void);
 _CRTIMP int __cdecl __MINGW_NOTHROW	_setmaxstdio (int);
 #endif
+#ifdef __COREDLL__
+/* gnulib's getdtablesize (libiconv srclib) asks for the stdio table
+   size; resolves to the coredll_stubs.o shim in libmingw32.a. */
+int __cdecl	_getmaxstdio (void);
+#endif
 
 #if __MSVCRT_VERSION__ >= 0x800
 _CRTIMP unsigned int __cdecl __MINGW_NOTHROW _get_output_format (void);

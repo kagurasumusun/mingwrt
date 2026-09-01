@@ -283,6 +283,14 @@ _CRTIMP int __cdecl __MINGW_NOTHROW _setmode (int, int);
    as in stdio.h. */
 _CRTIMP int __cdecl __MINGW_NOTHROW	remove (const char*);
 #endif
+#ifdef __COREDLL__
+/* Directory operations have no COREDLL backing; these resolve to the
+   coredll_stubs.o shims in libmingw32.a. */
+int __cdecl _chdir (const char*);
+char* __cdecl _getcwd (char*, size_t);
+/* gnulib's canonicalize-lgpl probes path components through faccessat. */
+int __cdecl faccessat (int, const char*, int, int);
+#endif
 _CRTIMP int __cdecl __MINGW_NOTHROW	rename (const char*, const char*);
 #ifndef __COREDLL__
 /* SH_... flags for nShFlags defined in share.h
