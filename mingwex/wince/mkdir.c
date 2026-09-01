@@ -10,6 +10,7 @@
  */
 
 #include <windows.h>
+#include <sys/types.h> /* mode_t */
 #include <io.h>
 
 int
@@ -22,8 +23,11 @@ _mkdir (const char *dirname)
   return 0;
 }
 
+/* POSIX mkdir takes a mode; CE has no permissions, so it is ignored.
+   libc++ <filesystem> calls mkdir(p, st_mode). */
 int
-mkdir (const char *dirname)
+mkdir (const char *dirname, mode_t mode)
 {
+  (void) mode;
   return _mkdir (dirname);
 }

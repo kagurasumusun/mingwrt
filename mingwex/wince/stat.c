@@ -69,6 +69,12 @@ __stat_by_file_info (struct stat_file_info_t *fi, struct _stat *st, int exec)
   st->st_ctime = __FILETIME_to_time_t (&fi->ftCreationTime);
   st->st_atime = __FILETIME_to_time_t (&fi->ftLastAccessTime);
 
+  /* POSIX high-resolution mirrors; libc++ <filesystem> reads
+     st_mtim/st_atim/st_ctim on the POSIX path. */
+  __FILETIME_to_timespec (&fi->ftLastWriteTime, &st->st_mtim);
+  __FILETIME_to_timespec (&fi->ftCreationTime, &st->st_ctim);
+  __FILETIME_to_timespec (&fi->ftLastAccessTime, &st->st_atim);
+
   /* Looks like the code below is never triggered.
      Windows CE always only keeps the LastWriteTime, and
      copies it to the CreationTime and LastAccessTime fields.  */
@@ -143,4 +149,11 @@ int
 stat (const char *path, struct stat *st)
 {
   return _stat (path, (struct _stat *)st);
+}
+
+/* POSIX lstat: COREDLL has no symlink support, so lstat is stat. */
+int
+lstat (const char *path, struct stat *st)
+{
+  return stat (path, st);
 }
