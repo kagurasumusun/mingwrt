@@ -22,10 +22,6 @@
 #endif /* Not RC_INVOKED */
 
 #include <sys/types.h>
-#ifdef __COREDLL__
-/* POSIX struct timespec for the st_atim/st_mtim/st_ctim mirrors. */
-#include <time.h>
-#endif
 
 /*
  * Constants for the stat st_mode member.
@@ -109,11 +105,6 @@ struct _stat
 				 * on FAT) */
 	time_t	st_mtime;	/* Modified time */
 	time_t	st_ctime;	/* Creation time */
-#ifdef __COREDLL__
-	struct timespec st_atim;
-	struct timespec st_mtim;
-	struct timespec st_ctim;
-#endif
 };
 
 #ifndef	_NO_OLDNAMES
@@ -132,11 +123,6 @@ struct stat
 				 * on FAT) */
 	time_t	st_mtime;	/* Modified time */
 	time_t	st_ctime;	/* Creation time */
-#ifdef __COREDLL__
-	struct timespec st_atim;
-	struct timespec st_mtim;
-	struct timespec st_ctim;
-#endif
 };
 #endif /* _NO_OLDNAMES */
 
