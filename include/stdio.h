@@ -560,12 +560,11 @@ _CRTIMP FILE* __cdecl __MINGW_NOTHROW	_fdopen (int, const char*);
 #ifndef __COREDLL__
 _CRTIMP FILE* __cdecl __MINGW_NOTHROW	_fsopen (const char*, const char*, int);
 #endif
-#ifdef __COREDLL__
-/* See declaration of fileno below.  */
-_CRTIMP void * __cdecl __MINGW_NOTHROW	_fileno (FILE*);
-#else
+/* See the fileno declaration below: CE file descriptors are HANDLES, but
+   on arm (32-bit) an int carries one losslessly, and gnulib's binary-io.h
+   (#define fileno _fileno) feeds the result straight into _setmode(int,
+   int) - a void* here breaks every -Wconversion-clean build. */
 _CRTIMP int __cdecl __MINGW_NOTHROW	_fileno (FILE*);
-#endif
 _CRTIMP int __cdecl __MINGW_NOTHROW	_fcloseall (void);
 #ifdef __MSVCRT__
 _CRTIMP int __cdecl __MINGW_NOTHROW	_getmaxstdio (void);
