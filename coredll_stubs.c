@@ -161,9 +161,8 @@ int _dup2(int fd1, int fd2)
 /* COREDLL has no strerror, signal machinery, or process/module queries
    used by gnulib's error/sigprocmask/raise/progreloc/dup2/fcntl (libiconv
    srclib, Stage 5).  The shims below keep those references resolvable and
-   degrade the way the platform actually behaves: signals do not exist,
-   the program path is unavailable, and the pseudo process handle is the
-   usual -1. */
+   degrade the way the platform actually behaves: signals do not exist
+   and the program path is unavailable.  */
 
 char *strerror(int errnum)
 {
@@ -187,11 +186,6 @@ int __cdecl raise(int sig)
   return -1;
 }
 
-void * __cdecl GetCurrentProcess(void)
-{
-  return (void *)-1;
-}
-
 unsigned long __cdecl GetModuleFileNameA(void *hModule, char *lpFilename,
                                          unsigned long nSize)
 {
@@ -211,27 +205,16 @@ unsigned long __cdecl GetFileType(void *hFile)
   return 0;
 }
 
-/* The Vista-era loader probing (LoadLibraryA/GetProcAddressW, declared by
-   w32api but absent from COREDLL) is only reached when the gnulib code
-   thinks dynamic resolution is possible; a NULL module handle keeps the
-   function pointers it feeds NULL, which every caller checks. */
+/* COREDLL exports LoadLibraryW only (every CE 3.0-8 def and every real
+   device SDK import lib agrees); the gnulib code that probes for
+   optional desktop DLLs calls LoadLibraryA, so fail cleanly with a NULL
+   module handle, which its callers check.  GetProcAddressW *is* a real
+   COREDLL export (mapped from the plain GetProcAddress name by
+   winbase.h, exactly like the Microsoft SDKs), so it deliberately has
+   no shim here. */
 void * __cdecl LoadLibraryA(const char *lpLibFileName)
 {
   (void)lpLibFileName;
-  return 0;
-}
-
-void * __cdecl GetProcAddressW(void *hModule, const wchar_t *lpProcName)
-{
-  (void)hModule;
-  (void)lpProcName;
-  return 0;
-}
-
-void * __cdecl GetProcAddress(void *hModule, const char *lpProcName)
-{
-  (void)hModule;
-  (void)lpProcName;
   return 0;
 }
 
