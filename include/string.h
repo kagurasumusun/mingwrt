@@ -46,9 +46,9 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	strcoll (const char*, const char*);	/* Compa
 #endif
 _CRTIMP char* __cdecl __MINGW_NOTHROW	strcpy (char*, const char*);
 _CRTIMP size_t __cdecl __MINGW_NOTHROW	strcspn (const char*, const char*)  __MINGW_ATTRIB_PURE;
-#ifndef __COREDLL__
+/* strerror lives in the coredll_stubs.o shim (libmingw32.a) on COREDLL;
+   COREDLL itself does not export it. */
 _CRTIMP char* __cdecl __MINGW_NOTHROW	strerror (int); /* NOTE: NOT an old name wrapper. */
-#endif
 _CRTIMP size_t __cdecl __MINGW_NOTHROW	strlen (const char*)  __MINGW_ATTRIB_PURE;
 _CRTIMP char* __cdecl __MINGW_NOTHROW	strncat (char*, const char*, size_t);
 _CRTIMP int __cdecl __MINGW_NOTHROW	strncmp (const char*, const char*, size_t)  __MINGW_ATTRIB_PURE;
