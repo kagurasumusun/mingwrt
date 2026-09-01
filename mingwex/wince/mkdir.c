@@ -10,7 +10,6 @@
  */
 
 #include <windows.h>
-#include <sys/types.h> /* mode_t */
 #include <io.h>
 
 int
@@ -23,11 +22,11 @@ _mkdir (const char *dirname)
   return 0;
 }
 
-/* POSIX mkdir takes a mode; CE has no permissions, so it is ignored.
-   libc++ <filesystem> calls mkdir(p, st_mode). */
+/* The CE CRT keeps the one-argument POSIX mkdir (there are no
+   permissions on FAT/CE; libc++ <filesystem>'s two-argument call is
+   mapped back onto this in its posix_compat.h CE branch). */
 int
-mkdir (const char *dirname, mode_t mode)
+mkdir (const char *dirname)
 {
-  (void) mode;
   return _mkdir (dirname);
 }

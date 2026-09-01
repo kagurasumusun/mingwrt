@@ -198,14 +198,7 @@ _CRTIMP int __cdecl __MINGW_NOTHROW chdir (const char*);
 _CRTIMP char* __cdecl __MINGW_NOTHROW getcwd (char*, size_t);
 _CRTIMP char* __cdecl __MINGW_NOTHROW mktemp (char*);
 #endif
-#ifdef __COREDLL__
-/* POSIX mkdir takes a mode (libc++ <filesystem> calls
-   detail::mkdir(p, st_mode)).  The mode is ignored on CE (no
-   permissions), but the two-argument signature is required. */
-_CRTIMP int __cdecl __MINGW_NOTHROW mkdir (const char*, mode_t);
-#else
 _CRTIMP int __cdecl __MINGW_NOTHROW mkdir (const char*);
-#endif
 _CRTIMP int __cdecl __MINGW_NOTHROW rmdir (const char*);
 _CRTIMP int __cdecl __MINGW_NOTHROW chmod (const char*, int);
 #endif /* _UWIN */
