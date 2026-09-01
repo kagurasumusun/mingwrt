@@ -10,7 +10,15 @@
  */
 
 #ifdef __COREDLL__
-# include_next <direct.h>
+/* CeGCC pairs this header with the COREDLL runtime's own direct.h further
+   down the include path.  A sysroot assembled from this tree alone has
+   nothing after us, so include the next header only when one exists and
+   fall through to the (deliberately empty on COREDLL) declarations below.
+   Same pattern as float.h (CI 33353690290 / 33355350730); this fixed the
+   libiconv srclib build (cellvm-build Stage 5). */
+# if defined(__has_include_next) && __has_include_next(<direct.h>)
+#  include_next <direct.h>
+# endif
 #else /* __COREDLL__ */
 
 #ifndef	_DIRECT_H_
