@@ -526,6 +526,24 @@ _invalid_parameter_handler _set_invalid_parameter_handler (_invalid_parameter_ha
 # endif /* __MSVCRT_VERSION__ >= 0x800 */
 #endif /* __MSVCRT__ */
 
+#ifdef __COREDLL__
+/* COREDLL exports _set_invalid_parameter_handler; gnulib's msvc-inval.c
+   (libiconv srclib) reaches it through <stdlib.h>, the same header the
+   MSVCRT build declares it in. */
+# ifndef _UINTPTR_T_DEFINED
+#  define _UINTPTR_T_DEFINED
+typedef unsigned int uintptr_t;
+# endif
+typedef void
+(* _invalid_parameter_handler) (
+    const wchar_t *,
+    const wchar_t *,
+    const wchar_t *,
+    unsigned int,
+    uintptr_t);
+_invalid_parameter_handler _set_invalid_parameter_handler (_invalid_parameter_handler);
+#endif
+
 #if defined(__MSVCRT__) || defined (__COREDLL__)
 _CRTIMP unsigned int __cdecl __MINGW_NOTHROW _rotl(unsigned int, int) __MINGW_ATTRIB_CONST;
 _CRTIMP unsigned int __cdecl __MINGW_NOTHROW _rotr(unsigned int, int) __MINGW_ATTRIB_CONST;
