@@ -276,7 +276,11 @@ int __cdecl __MINGW_NOTHROW __toascii (int);
 int __cdecl __MINGW_NOTHROW __iscsymf (int);		/* Valid first character in C symbol */
 int __cdecl __MINGW_NOTHROW __iscsym (int);		/* Valid character in C symbol (after first) */
 
-#if !(defined (__NO_INLINE__) || defined (__NO_CTYPE_INLINES))
+#if (!(defined (__NO_INLINE__) || defined (__NO_CTYPE_INLINES)) \
+     || defined (__COREDLL__))
+/* coredll.dll exports none of these, so on CE the inlines must stay
+   active even under __NO_INLINE__ (-O0 / -fno-inline), where __CRT_INLINE
+   forces them to be inlined; see the __ISCTYPE block above. */
 __CRT_INLINE int __cdecl __MINGW_NOTHROW __isascii(int c) {return ((c & ~0x7F) == 0);} 
 __CRT_INLINE int __cdecl __MINGW_NOTHROW __toascii(int c) {return (c & 0x7F);}
 __CRT_INLINE int __cdecl __MINGW_NOTHROW __iscsymf(int c) {return (isalpha(c) || (c == '_'));}

@@ -191,22 +191,24 @@
 #ifdef __cplusplus
 # define __CRT_INLINE inline
 #else
-# if __GNUC_STDC_INLINE__
+# ifdef __COREDLL__
+   /* There isn't any out-of-line version of most of these functions
+      in coredll.dll, so they must always be inlined: this is needed
+      for -O0 and -fno-inline.  This branch has to take precedence
+      over __GNUC_STDC_INLINE__ - clang (unlike gcc in gnu89 mode)
+      defines that macro in C99 modes and would otherwise emit
+      references to out-of-line copies that do not exist in coredll.dll,
+      breaking every -O0 CE link.  This is still problematic if the
+      user tries to take the address of these functions; out-of-line
+      copies are added as those cases are found.
+      Note: We can't use static inline here, as most of these functions
+      will be declared elsewhere with external linkage, and gcc will
+      barf on that.  */
+#  define __CRT_INLINE extern __inline__ __attribute__((__always_inline__, __gnu_inline__))
+# elif __GNUC_STDC_INLINE__
 #  define __CRT_INLINE extern inline __attribute__((__gnu_inline__))
 # else
-#  ifdef __COREDLL__
-   /* There isn't any out-of-line version of most of 
-      these functions in coredll.dll, so we need this for -O0,
-      or for -fno-inline.  This is still problematic if the user
-      tries t	o take the address of these functions.  We will slowly
-      add out-of-line copies as those cases are found.
-      Note: We can't use static inline here, as most of these functions
-      will be declared elsew	here with external linkage, and gcc will
-      barf on that.  */
-#   define __CRT_INLINE extern __inline__ __attribute__((__always_inline__))
-#  else
-#   define __CRT_INLINE extern __inline__
-#  endif
+#  define __CRT_INLINE extern __inline__
 # endif
 #endif
 
