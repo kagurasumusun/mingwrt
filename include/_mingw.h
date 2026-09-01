@@ -275,6 +275,16 @@
 /* TODO: Mark (almost) all CRT functions as __MINGW_NOTHROW.  This will
 allow GCC to optimize away some EH unwind code, at least in DW2 case.  */
 
+#if defined (__COREDLL__) && defined (__MSVCRT__)
+/* Clang's *-windows-gnu targets predefine __MSVCRT__; a CE build is
+   selected with -D__COREDLL__ and the two are mutually exclusive (the
+   CeGCC GCC driver defines __COREDLL__ only).  Keeping both active
+   exposes the MSVCRT-only declarations (whose structs and imports do
+   not exist on COREDLL) and conflicts with the COREDLL shims.  */
+# undef __MSVCRT__
+# undef __MSVCRT_VERSION__
+#endif
+
 #if defined __MSVCRT__ && !defined (__MSVCRT_VERSION__)
 /*  High byte is the major version, low byte is the minor. */
 # define __MSVCRT_VERSION__ 0x0600
