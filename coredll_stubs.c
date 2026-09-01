@@ -76,6 +76,12 @@ int _getmaxstdio(void)
   return 512;
 }
 
+int _setmaxstdio(int newmax)
+{
+  (void)newmax;
+  return 512;
+}
+
 intptr_t _open_osfhandle(intptr_t osfhandle, int flags)
 {
   (void)osfhandle;
