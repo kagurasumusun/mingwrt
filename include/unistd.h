@@ -46,6 +46,32 @@ __CRT_INLINE int ftruncate(int __fd, off_t __length)
 }
 #endif
 
+#ifndef _NO_OLDNAMES
+/* POSIX file layer (libc++ <filesystem> compiles these on every
+   non-Win32API target, WinCE included).  COREDLL has no symlink
+   support at all, so link/symlink/readlink live in mingwex/wince and
+   fail honestly with ENOSYS/ENOENT; truncate/fchmod wrap chsize/chmod. */
+int link(const char*, const char*);
+int symlink(const char*, const char*);
+int readlink(const char*, char*, size_t);
+int truncate(const char*, off_t);
+int fchmod(int, mode_t);
+/* Path configuration and *at() family (POSIX.1-2008); libc++ <filesystem>
+   operations.cpp uses these.  mingwex/wince implements them with the
+   plain functions (CE has no dir-fd or symlink support). */
+long pathconf(const char*, int);
+int openat(int, const char*, int, ...);
+int fchmodat(int, const char*, mode_t, int);
+int unlinkat(int, const char*, int);
+#endif /* _NO_OLDNAMES */
+
+#ifdef __COREDLL__
+/* pathconf name constants (POSIX.1-2008). */
+#define _PC_LINK_MAX 0
+#define _PC_PATH_MAX 1
+#define _PC_NAME_MAX 2
+#endif
+
 #ifdef __cplusplus
 }
 #endif

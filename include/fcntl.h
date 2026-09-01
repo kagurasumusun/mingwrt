@@ -72,4 +72,23 @@
 
 #endif	/* Not _NO_OLDNAMES */
 
+#ifndef _NO_OLDNAMES
+/* POSIX open(2) flags used by libc++ <filesystem> (operations.cpp).
+   Non-blocking/close-on-exec/dir-only/no-follow are meaningless on a
+   CE fd (which is the Win32 handle), so they are defined as 0 --
+   exactly like the values libc++ itself assigns on _LIBCPP_WIN32API
+   (posix_compat.h: O_NONBLOCK 0). */
+#define	O_NONBLOCK	0
+#define	O_CLOEXEC	0
+#define	O_DIRECTORY	0
+#define	O_NOFOLLOW	0
+
+/* *at() family sentinels and flags (POSIX.1-2008); CE has no
+   directory-fd support, so only AT_FDCWD is meaningful.  mingwex/wince
+   implements openat/fdopendir/unlinkat on top of the plain functions. */
+#define	AT_FDCWD	-100
+#define	AT_REMOVEDIR	0x200
+#define	AT_SYMLINK_NOFOLLOW	0x100
+#endif	/* Not _NO_OLDNAMES */
+
 #endif	/* Not _FCNTL_H_ */

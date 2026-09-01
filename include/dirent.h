@@ -58,6 +58,12 @@ typedef struct
 } DIR;
 
 DIR* __cdecl __MINGW_NOTHROW opendir (const char*);
+#ifdef __COREDLL__
+/* POSIX fdopendir (libc++ <filesystem> remove_all): CE cannot convert
+   a handle to a path, so mingwex/wince/at.c fails it with ENOTSUP and
+   remove_all() falls back to the path-based removal. */
+DIR* __cdecl __MINGW_NOTHROW fdopendir (int);
+#endif
 struct dirent* __cdecl __MINGW_NOTHROW readdir (DIR*);
 int __cdecl __MINGW_NOTHROW closedir (DIR*);
 void __cdecl __MINGW_NOTHROW rewinddir (DIR*);
