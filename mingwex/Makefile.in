@@ -266,7 +266,7 @@ MATHCE_OBJS = \
 	w_atanh.o w_coshf.o w_expf.o w_hypotf.o w_lgamma.o w_lgammaf.o w_log2.o \
 	w_log2f.o w_log10f.o w_logf.o w_powf.o w_remainder.o w_remainderf.o \
 	w_sinhf.o w_tgamma.o w_tgammaf.o fpclassify.o \
-	s_isnanf.o s_finitef.o
+	s_isnanf.o s_finitef.o s_isnanl.o
 MATCHCE_ROUND_OBJS=llround.o llroundf.o lround.o lroundf.o s_round.o s_roundf.o
 GDTOA_OBJS = \
 	dmisc.o dtoa.o g__fmt.o g_dfmt.o g_ffmt.o g_xfmt.o gdtoa.o \
