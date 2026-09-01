@@ -629,6 +629,8 @@ libcoredll.a: coredll.def
 libcoredll3.a: coredll3.def
 libcoredll4.a: coredll4.def
 libcoredll6.a: coredll6.def
+libcoredll7.a: coredll7.def
+libcoredll8.a: coredll8.def
 libcrtdll.a: crtdll.def
 libmsvcrt.a: msvcrt.def
 libmsvcrtd.a: msvcrtd.def
