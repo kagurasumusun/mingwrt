@@ -427,7 +427,7 @@ crt2.o dllcrt2.o:
 	$(CC) -c -D__MSVCRT__ -U__CRTDLL__ $(ALL_CFLAGS) $< -o $@
 
 crt3.o dllcrt3.o:
-	$(CC) -c -D__COREDLL__ -U__CRTDLL__ -U__MSVCRT__ $(ALL_CFLAGS) $< -o $@
+	$(CC) -c -D__COREDLL__ -D__MINGW32CE__ -U__CRTDLL__ -U__MSVCRT__ $(ALL_CFLAGS) $< -o $@
 
 check: check-headers
 
