@@ -281,7 +281,12 @@ ifneq (,$(findstring mingw32ce,$(host_alias)))
 LIB_OBJS = $(WINCE_OBJS) $(MATHCE_OBJS) $(MATCHCE_ROUND_OBJS) \
 	$(Q8_OBJS) $(STDIO_OBJS_CE) \
 	$(POSIX_OBJS) $(COMPLEX_OBJS_CE) \
-	$(GDTOA_OBJS) $(C99OBJS)
+	$(GDTOA_OBJS) $(C99OBJS) \
+	mingw-aligned-malloc.o
+# mingw-aligned-malloc.o: the desktop branch takes the whole REPLACE_OBJS,
+# but mingw-fseek.o is a desktop-CRT-internals file; only the aligned
+# allocator is wanted here (libc++abi's fallback allocator and libc++
+# aligned operator new resolve __mingw_aligned_malloc/free against it).
 MATHCE_FLAGS=-D_IEEE_LIBM -D__MINGW32CE__
 MATHDIR=mathce
 else

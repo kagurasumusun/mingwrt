@@ -9,7 +9,20 @@
  /* This routine has been placed in the public domain.*/
 
 #ifdef __COREDLL__
-/* coredll.dll doesn't export strtold.  */
+/* coredll.dll doesn't export strtold, so the desktop implementation
+   below (which calls it) is compiled out there.  The AAPCS baseline
+   this CRT targets (armel, soft-float) gives long double the same
+   64-bit double representation, which makes wcstold and wcstod the
+   same ABI entry: implement wcstold directly as wcstod.  libc++'s
+   std::stold needs this symbol (Stage 5 of the cellvm-build
+   pipeline).  */
+#include <wchar.h>
+
+long double
+wcstold (const wchar_t * __restrict__ wcs, wchar_t ** __restrict__ wcse)
+{
+  return wcstod (wcs, wcse);
+}
 #else
 
 #define WIN32_LEAN_AND_MEAN
