@@ -24,6 +24,54 @@
 ;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ;
 EXPORTS
+#ifdef __COREDLL__
+; COREDLL exports the old names with a leading underscore (the device has
+; _X but not X).  "X=_X" makes dlltool bind the plain-name call to the
+; device export _X, so the import names a symbol the device actually
+; exports.  Importing plain X (what a bare entry would do) fails at load
+; time on the device: "could not resolve import X".  This covers every
+; CE-active plain name below, verified against the device COREDLL export
+; table of the SHARP Brain (PW-AJ2/PW-SH6, WinCE 6.0) NK dump.
+#define ecvt ecvt=_ecvt
+#define fcvt fcvt=_fcvt
+#define fileno fileno=_fileno
+#define gcvt gcvt=_gcvt
+#define itoa itoa=_itoa
+#define ltoa ltoa=_ltoa
+#define memccpy memccpy=_memccpy
+#define memicmp memicmp=_memicmp
+#define setmode setmode=_setmode
+#define strdup strdup=_strdup
+#define stricmp stricmp=_stricmp
+#define strlwr strlwr=_strlwr
+#define strnicmp strnicmp=_strnicmp
+#define strnset strnset=_strnset
+#define strrev strrev=_strrev
+#define strset strset=_strset
+#define strupr strupr=_strupr
+#define swab swab=_swab
+#define wcsdup wcsdup=_wcsdup
+#define wcsicmp wcsicmp=_wcsicmp
+#define wcslwr wcslwr=_wcslwr
+#define wcsnicmp wcsnicmp=_wcsnicmp
+#define wcsnset wcsnset=_wcsnset
+#define wcsrev wcsrev=_wcsrev
+#define wcsset wcsset=_wcsset
+#define wcsupr wcsupr=_wcsupr
+#define j0 j0=_j0
+#define j1 j1=_j1
+#define jn jn=_jn
+#define y0 y0=_y0
+#define y1 y1=_y1
+#define yn yn=_yn
+#define chgsign chgsign=_chgsign
+#define finite finite=_finite
+#define fpclass fpclass=_fpclass
+#define cabs cabs=_cabs
+#define hypot hypot=_hypot
+#define logb logb=_logb
+#define nextafter nextafter=_nextafter
+#endif /* __COREDLL__ */
 #ifndef __COREDLL__
 access
 chdir
