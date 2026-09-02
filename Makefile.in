@@ -426,7 +426,17 @@ crt2.o dllcrt2.o:
 	$(CC) -c -D__MSVCRT__ -U__CRTDLL__ $(ALL_CFLAGS) $< -o $@
 
 crt3.o dllcrt3.o:
-	$(CC) -c -D__COREDLL__ -D__MINGW32CE__ -U__CRTDLL__ -U__MSVCRT__ $(ALL_CFLAGS) $< -o $@
+	$(CC) -c -D__COREDLL__ -D__MINGW32CE__ -U__CRTDLL__ -U__MSVCRT__ $(ALL_CFLAGS) \
+		-fms-extensions -fno-ms-compatibility $< -o $@
+# -fms-extensions: crt3.c wraps WinMainCRTStartup's call to WinMain in a
+# __try/__except top-level crash logger (see crt3.c). The rest of this
+# tree is deliberately built with -fno-ms-extensions (__cdecl is not an
+# MS keyword here; see build-wince-sysroot.sh), so this is a per-rule
+# override, not a project-wide default change. Placed after $(ALL_CFLAGS)
+# so it wins over that tree-wide -fno-ms-extensions (clang/gcc: later
+# -f[no-]ms-extensions on the command line wins). dllcrt3.o (built from
+# dllcrt1.c, which does not use __try) picks up the same flag harmlessly
+# via this shared recipe.
 
 check: check-headers
 
