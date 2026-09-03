@@ -260,11 +260,36 @@ MOLD_OBJS = isascii.o iscsym.o iscsymf.o toascii.o \
 	strcasecmp.o strncasecmp.o wcscmpi.o
 
 ifneq (,$(findstring mingw32ce,$(target_alias)))
+# The COREDLL import surface is arch-specific, so an i386 CE target must not be
+# handed the ARM one.  x86 coredll carries the SEH/C++ EH runtime in-DLL
+# (_except_handler3, _except_handler4_common, _local_unwind2/_local_unwind4,
+# _EH_prolog/_EH_prolog2, _SEH_prolog/_SEH_epilog, __abnormal_termination,
+# _CxxThrowException, _setjmp3), the x86 compiler helpers (_chkstk,
+# _alloca_probe*, _ftol*, _alldiv/_allmul/_aullshr/..., the _CI* intrinsics),
+# the port I/O intrinsics (_inp/_outp family) and the MSVC/__thiscall
+# (QAE/UAE/AAE) spellings of the C++ EH/RTTI exports.  ARM instead forwards its
+# floating point to FPCRT, spells those exports with __cdecl mangling
+# (QAA/UAA/AAA) and uses __C_specific_handler.
+#
+# The library NAME differs (libcoredll6-x86.a) so that an x86 sysroot never
+# contains an ARM COREDLL import library and vice versa; clang's WinCE linker
+# driver picks the right one from the triple's architecture.  Only CE 6.0 has
+# an x86 def: the CE 4.2 and CE 5.0 defs were parsed from ARM-retail shared
+# source and no x86 CE 4/5 source is available, so i386 CE 4/5 links still use
+# the ARM surface (see utils/wince/README.md "Version policy").
+ifneq (,$(findstring i386,$(target_alias)))
+LIBS = libcoredll.a libcoredll4.a libcoredll6-x86.a \
+       libmingw32.a \
+       libceoldname.a \
+       $(LIBM_A) \
+       libmingwthrd.a
+else
 LIBS = libcoredll.a libcoredll4.a libcoredll6.a \
        libmingw32.a \
        libceoldname.a \
        $(LIBM_A) \
        libmingwthrd.a
+endif
 else
 LIBS = libcrtdll.a \
        libmsvcrt.a  libmsvcrtd.a \
@@ -292,6 +317,7 @@ INSTDOCS = CONTRIBUTORS \
 SRCDIST_FILES = CRT_noglob.c CRTfmode.c CRTglob.c CRTinit.c ChangeLog \
 Makefile.in README TODO config.guess config.sub configure configure.in \
 aclocal.m4 crt1.c crtdll.def crtmt.c crtst.c  dllcrt1.c dllmain.c \
+coredll.def coredll4.def coredll6.def coredll6-x86.def coredll_stubs.c \
 gccmain.c init.c install-sh jamfile main.c mkinstalldirs \
 moldname.def.in msvcrt.def.in ofmt_stub.s \
 mthr.c mthr_init.c mthr_stub.c readme.txt \
@@ -638,6 +664,7 @@ force:
 libcoredll.a: coredll.def
 libcoredll4.a: coredll4.def
 libcoredll6.a: coredll6.def
+libcoredll6-x86.a: coredll6-x86.def
 libcrtdll.a: crtdll.def
 libmsvcrt.a: msvcrt.def
 libmsvcrtd.a: msvcrtd.def
