@@ -116,6 +116,24 @@ _CRTIMP char* __cdecl __MINGW_NOTHROW		ctime (const time_t*);
 _CRTIMP struct tm*  __cdecl __MINGW_NOTHROW	gmtime (const time_t*);
 _CRTIMP struct tm*  __cdecl __MINGW_NOTHROW	localtime (const time_t*);
 
+#ifndef __STRICT_ANSI__
+/* POSIX.1 thread-safe conversions.  COREDLL has no _r variants. */
+struct tm* __cdecl __MINGW_NOTHROW gmtime_r (const time_t *, struct tm *);
+struct tm* __cdecl __MINGW_NOTHROW localtime_r (const time_t *, struct tm *);
+
+#ifndef CLOCK_REALTIME
+#define CLOCK_REALTIME  0
+#define CLOCK_MONOTONIC 1
+#endif
+#ifndef _CLOCKID_T_DEFINED
+#define _CLOCKID_T_DEFINED
+typedef int clockid_t;
+#endif
+int __cdecl __MINGW_NOTHROW clock_gettime (clockid_t, struct timespec *);
+int __cdecl __MINGW_NOTHROW clock_getres (clockid_t, struct timespec *);
+int __cdecl __MINGW_NOTHROW nanosleep (const struct timespec *, struct timespec *);
+#endif /* !__STRICT_ANSI__ */
+
 _CRTIMP size_t __cdecl __MINGW_NOTHROW		strftime (char*, size_t, const char*, const struct tm*);
 
 #ifndef __STRICT_ANSI__
