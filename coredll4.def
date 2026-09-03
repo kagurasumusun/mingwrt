@@ -15,7 +15,12 @@
 ; but they are coremain coredll exports on every CE generation and clang's
 ; emulated TLS (__emutls_get_address) imports TlsAlloc/TlsFree, so a CE 4.2 program
 ; using thread_local would fail to link without them.
-; 1745 name exports.
+; The EXPORTS keyword that a case-insensitive sort of the export list had
+; stranded between `exp' and `ExtCreateRegion' is removed: llvm-dlltool
+; lexes a bare EXPORTS as a section keyword, so it silently re-entered the
+; export list and was harmless -- but a module-definition file permits
+; exactly one EXPORTS, and a stricter consumer would reject the file.
+; 1744 name exports.
 
 LIBRARY COREDLL
 EXPORTS
@@ -591,7 +596,6 @@ EventModify
 ExcludeClipRect
 ExitThread
 exp
-EXPORTS
 ExtCreateRegion
 ExtEscape
 ExtractIconExW

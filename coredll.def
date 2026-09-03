@@ -16,7 +16,12 @@
 ; pre-k.coredll loader/devload exports CloseAllDeviceHandles,
 ; SetWDevicePowerHandler, SystemStarted, ThreadAttachAllDLLs and
 ; ThreadDetachAllDLLs: CE 5.0 kept these in the single coredll).
-; 1946 exports total (incl. 9 ordinal-only).
+; The EXPORTS keyword that a case-insensitive sort of the export list had
+; stranded between `exp' and `ExtCreateRegion' is removed: llvm-dlltool
+; lexes a bare EXPORTS as a section keyword, so it silently re-entered the
+; export list and was harmless -- but a module-definition file permits
+; exactly one EXPORTS, and a stricter consumer would reject the file.
+; 1945 exports total (incl. 9 ordinal-only).
 
 LIBRARY COREDLL
 EXPORTS
@@ -719,7 +724,6 @@ EventModify
 ExcludeClipRect
 ExitThread
 exp
-EXPORTS
 ExtCreateRegion
 ExtEscape
 ExtractIconExW
