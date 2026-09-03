@@ -58,6 +58,13 @@ _CRTIMP char* __cdecl __MINGW_NOTHROW	strrchr (const char*, int)  __MINGW_ATTRIB
 _CRTIMP size_t __cdecl __MINGW_NOTHROW	strspn (const char*, const char*)  __MINGW_ATTRIB_PURE;
 _CRTIMP char* __cdecl __MINGW_NOTHROW	strstr (const char*, const char*)  __MINGW_ATTRIB_PURE;
 _CRTIMP char* __cdecl __MINGW_NOTHROW	strtok (char*, const char*);
+#ifndef __STRICT_ANSI__
+/* POSIX.  strnlen is a coredll 6.0 export; CE 4/5 use the mingwex
+   fallback.  strndup / strtok_r are never in COREDLL. */
+size_t __cdecl __MINGW_NOTHROW strnlen (const char *, size_t) __MINGW_ATTRIB_PURE;
+char*  __cdecl __MINGW_NOTHROW strndup (const char *, size_t) __MINGW_ATTRIB_MALLOC;
+char*  __cdecl __MINGW_NOTHROW strtok_r (char *, const char *, char **);
+#endif
 #ifndef __COREDLL__
 _CRTIMP size_t __cdecl __MINGW_NOTHROW	strxfrm (char*, const char*, size_t);
 #endif
