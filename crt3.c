@@ -21,6 +21,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <excpt.h>
+#include <wince_cxx_eh.h>
 
 extern void __gccmain ();
 extern void _pei386_runtime_relocator (void);
@@ -119,16 +120,69 @@ __wince_crashlog_write (EXCEPTION_POINTERS *ep)
   fclose (f);
 }
 
-/* Filter: always logs and always executes the handler (there is nothing
-   safe to resume into after an unexpected exception this high up the
-   call stack).  Kept as a separate helper - rather than inlining the
-   fprintf calls directly in the __except() filter expression - only to
-   keep the outlined filter clang generates small and easy to read in a
-   disassembly if this itself needs debugging later. */
+/*
+ * CE6: a top-level VEH (vectored exception handler), registered once at
+ * startup (see WinMainCRTStartup) so that a hardware fault raised on ANY
+ * thread of the process is logged - not just faults in the WinMain call
+ * chain.  A VEH runs before the kernel's frame-based (.pdata) dispatch,
+ * so it sees the fault even when the faulting function carries no .pdata
+ * ExceptionFlag (the common case: ordinary application code with no
+ * __try/__except).  It is process-global (covers every thread) and
+ * therefore strictly broader than the __try wrapping below.
+ *
+ * It deliberately skips C++ exceptions (WINCE_CXX_EH_NUMBER, see
+ * <wince_cxx_eh.h>): those are controlled exceptions that the C++ frame
+ * handler (Unit 3) or a user catch(...) is meant to consume, so logging
+ * every throw/catch would drown the log in noise.  A C++ exception that
+ * is genuinely *unhandled* still terminates the process via the __try
+ * backstop on the throwing thread (the one place that path is guaranteed
+ * to be present in this toolchain).
+ *
+ * The handler always returns EXCEPTION_CONTINUE_SEARCH: it only *logs*,
+ * it never resumes or swallows the fault.  Termination is left to the
+ * normal dispatch (frame handler / __try backstop), so a C++ frame that
+ * *does* catch the fault is not disturbed.
+ *
+ * __wince_crashlog_logged de-duplicates: if both the VEH (any thread) and
+ * the __try backstop (main thread) would fire for the same fault, only
+ * the first one writes the log.  A plain volatile flag is used on
+ * purpose - at this point (a fatal fault) a benign race is acceptable and
+ * pulling in Interlocked* from a VEH is the one thing the platform docs
+ * warn against.
+ */
+static volatile LONG __wince_crashlog_logged = 0;
+
+#if (_WIN32_WCE >= 0x0600)
+static LONG WINAPI
+__wince_crashlog_veh (PEXCEPTION_POINTERS ep)
+{
+  if (ep == NULL || ep->ExceptionRecord == NULL)
+    return EXCEPTION_CONTINUE_SEARCH;
+  if (ep->ExceptionRecord->ExceptionCode == WINCE_CXX_EH_NUMBER)
+    return EXCEPTION_CONTINUE_SEARCH; /* C++ exception: leave it to the frame handler */
+  if (!__wince_crashlog_logged)
+    {
+      __wince_crashlog_logged = 1;
+      __wince_crashlog_write (ep);
+    }
+  return EXCEPTION_CONTINUE_SEARCH; /* let the frame dispatch / __try backstop terminate */
+}
+#endif /* _WIN32_WCE >= 0x0600 */
+
+/* Filter: logs (unless the VEH already did) and always executes the
+   handler (there is nothing safe to resume into after an unexpected
+   exception this high up the call stack).  Kept as a separate helper -
+   rather than inlining the fprintf calls directly in the __except()
+   filter expression - only to keep the outlined filter clang generates
+   small and easy to read in a disassembly if this itself needs
+   debugging later.  On CE4/5 (no VEH API) this __except is the ONLY
+   top-level crash log; on CE6 the VEH is primary and this is the
+   backstop (e.g. for an unhandled C++ exception, which the VEH skips). */
 static int
 __wince_crashlog_filter (EXCEPTION_POINTERS *ep)
 {
-  __wince_crashlog_write (ep);
+  if (!__wince_crashlog_logged)
+    __wince_crashlog_write (ep);
   return EXCEPTION_EXECUTE_HANDLER;
 }
 
@@ -140,6 +194,19 @@ WinMainCRTStartup (HINSTANCE hInst, HINSTANCE hPrevInst,
                    LPWSTR lpCmdLine, int nCmdShow)
 {
   int nRet;
+
+#if (_WIN32_WCE >= 0x0600)
+  /*
+   * CE6: install the top-level VEH first, before anything else runs, so
+   * that a hardware fault on any thread (and even one during CRT start-up
+   * itself) is logged.  First=1 puts it at the head of the VEH list.  The
+   * handle is intentionally not retained: the VEH lives for the process
+   * lifetime, which is all a crash logger needs.  CE4/5 have no VEH API
+   * (AddVectoredExceptionHandler is CE6-only, see coredll6.def): there the
+   * __try/__except wrapping below is the only top-level crash log.
+   */
+  AddVectoredExceptionHandler (1, __wince_crashlog_veh);
+#endif /* _WIN32_WCE >= 0x0600 */
 
   /*
    * Initialize floating point unit.
