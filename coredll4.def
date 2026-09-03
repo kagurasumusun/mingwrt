@@ -9,7 +9,13 @@
 ; name-based import library.
 ; Augmented with the Pocket PC 2003 SDK coredll.lib name exports
 ; (C++-mangled WM-line IME internals).
-; 1743 name exports.
+; Restored TlsAlloc/TlsFree per MSDN ("TlsAlloc"/"TlsFree", Link Library:
+; Coredll.lib, "Windows CE 1.0 and later"): the device/SDK dump these defs were
+; verified against omitted them (the same gap the CE 5.0 coredll.def records),
+; but they are coremain coredll exports on every CE generation and clang's
+; emulated TLS (__emutls_get_address) imports TlsAlloc/TlsFree, so a CE 4.2 program
+; using thread_local would fail to link without them.
+; 1745 name exports.
 
 LIBRARY COREDLL
 EXPORTS
@@ -1626,7 +1632,9 @@ ThreadAttachAllDLLs
 ThreadBaseFunc
 ThreadDetachAllDLLs
 ThreadExceptionExit
+TlsAlloc
 TlsCall
+TlsFree
 TlsGetValue
 TlsSetValue
 tolower

@@ -11,7 +11,13 @@
 ; libraries; a name-based lookup of those would fail at load time.
 ; Verified symbol-for-symbol against a real CE 6.0 device SDK coredll.def
 ; (2104 name entries on the SDK side).
-; 2094 exports total (incl. 11 ordinal-only).
+; Restored TlsAlloc/TlsFree per MSDN ("TlsAlloc"/"TlsFree", Link Library:
+; Coredll.lib, "Windows CE 1.0 and later"): the device/SDK dump these defs were
+; verified against omitted them (the same gap the CE 5.0 coredll.def records),
+; but they are coremain coredll exports on every CE generation and clang's
+; emulated TLS (__emutls_get_address) imports TlsAlloc/TlsFree, so a CE 6.0 program
+; using thread_local would fail to link without them.
+; 2096 exports total (incl. 11 ordinal-only).
 
 LIBRARY COREDLL
 EXPORTS
@@ -1937,7 +1943,9 @@ TerminateThread
 THCreateSnapshot
 ThreadBaseFunc
 ThreadExceptionExit
+TlsAlloc
 TlsCall
+TlsFree
 TlsGetValue
 TlsSetValue
 tolower
