@@ -21,7 +21,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <excpt.h>
-#include <wince_cxx_eh.h>
 
 extern void __gccmain ();
 extern void _pei386_runtime_relocator (void);
@@ -130,18 +129,18 @@ __wince_crashlog_write (EXCEPTION_POINTERS *ep)
  * __try/__except).  It is process-global (covers every thread) and
  * therefore strictly broader than the __try wrapping below.
  *
- * It deliberately skips C++ exceptions (WINCE_CXX_EH_NUMBER, see
- * <wince_cxx_eh.h>): those are controlled exceptions that the C++ frame
- * handler (Unit 3) or a user catch(...) is meant to consume, so logging
- * every throw/catch would drown the log in noise.  A C++ exception that
- * is genuinely *unhandled* still terminates the process via the __try
- * backstop on the throwing thread (the one place that path is guaranteed
- * to be present in this toolchain).
+ * C++ exceptions do NOT reach this handler: under this toolchain they are
+ * unwound entirely in user space by libunwind through the ARM EHABI
+ * .ARM.exidx tables (see llvm-project utils/wince/WINEH-ABI-FACTS.md 4l),
+ * never through the kernel exception dispatcher, so there is nothing to
+ * filter out here.  An *unhandled* C++ exception runs std::terminate ->
+ * abort, which likewise does not traverse the VEH.  This handler therefore
+ * sees only hardware faults and explicit RaiseException / SEH events.
  *
  * The handler always returns EXCEPTION_CONTINUE_SEARCH: it only *logs*,
  * it never resumes or swallows the fault.  Termination is left to the
- * normal dispatch (frame handler / __try backstop), so a C++ frame that
- * *does* catch the fault is not disturbed.
+ * normal dispatch (an enclosing __try/__except frame handler, or the __try
+ * backstop below).
  *
  * __wince_crashlog_logged de-duplicates: if both the VEH (any thread) and
  * the __try backstop (main thread) would fire for the same fault, only
@@ -158,8 +157,6 @@ __wince_crashlog_veh (PEXCEPTION_POINTERS ep)
 {
   if (ep == NULL || ep->ExceptionRecord == NULL)
     return EXCEPTION_CONTINUE_SEARCH;
-  if (ep->ExceptionRecord->ExceptionCode == WINCE_CXX_EH_NUMBER)
-    return EXCEPTION_CONTINUE_SEARCH; /* C++ exception: leave it to the frame handler */
   if (!__wince_crashlog_logged)
     {
       __wince_crashlog_logged = 1;
@@ -177,7 +174,7 @@ __wince_crashlog_veh (PEXCEPTION_POINTERS ep)
    small and easy to read in a disassembly if this itself needs
    debugging later.  On CE4/5 (no VEH API) this __except is the ONLY
    top-level crash log; on CE6 the VEH is primary and this is the
-   backstop (e.g. for an unhandled C++ exception, which the VEH skips). */
+   backstop for a fault on the main thread that the VEH did not catch. */
 static int
 __wince_crashlog_filter (EXCEPTION_POINTERS *ep)
 {
