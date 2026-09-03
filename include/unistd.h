@@ -70,6 +70,14 @@ int unlinkat(int, const char*, int);
 #define _PC_LINK_MAX 0
 #define _PC_PATH_MAX 1
 #define _PC_NAME_MAX 2
+/* sysconf names (subset). */
+#define _SC_CLK_TCK 2
+#define _SC_PAGESIZE 30
+#define _SC_PAGE_SIZE _SC_PAGESIZE
+#define _SC_NPROCESSORS_ONLN 84
+int fsync(int);
+long sysconf(int);
+int mkstemp(char *);
 #endif
 
 #ifdef __cplusplus

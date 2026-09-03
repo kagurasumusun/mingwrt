@@ -101,7 +101,9 @@ WINCE_DISTFILES = \
 	asctime.c freopen.c gmtime.c localtime.c mktime.c strftime.c time.c \
 	tempnam.c unlink.c wcsftime.c fdopen.c read.c write.c open.c lseek.c \
 	close.c isalnum.c isalpha.c iscntrl.c isgraph.c islower.c isprint.c \
-	ispunct.c isspace.c isupper.c isxdigit.c _tolower.c _toupper.c lfind.c
+	ispunct.c isspace.c isupper.c isxdigit.c _tolower.c _toupper.c lfind.c \
+	localtime_r.c gmtime_r.c strnlen.c strndup.c strtok_r.c \
+	asprintf.c clock_gettime.c nanosleep.c fsync.c mkstemp.c sysconf.c
 
 MATHCE_DISTFILES = \
 	e_acosf.c e_acosh.c e_acoshf.c e_asinf.c e_atan2f.c e_atanh.c e_coshf.c \
@@ -251,7 +253,9 @@ WINCE_OBJS = \
 	ctime.o chsize.o findfile.o bsearch.o access.o mkdir.o rmdir.o lfind.o \
 	copysign.o finite.o hypot.o mathl.o ecvt.o carg_ce.o wcsdup.o imp_pow.o \
 	remove.o lseeki64.o utimes.o truncate.o readlink.o symlink.o link.o \
-	realpath.o fchmod.o statvfs.o pathconf.o at.o
+	realpath.o fchmod.o statvfs.o pathconf.o at.o \
+	localtime_r.o gmtime_r.o strnlen.o strndup.o strtok_r.o \
+	asprintf.o clock_gettime.o nanosleep.o fsync.o mkstemp.o sysconf.o
 MATHCE_OBJS = \
 	e_acosf.o e_acosh.o e_acoshf.o e_asinf.o e_atan2f.o e_atanh.o e_coshf.o \
 	e_expf.o e_gamma_r.o e_gammaf_r.o e_lgamma_r.o e_lgammaf_r.o e_log10f.o \

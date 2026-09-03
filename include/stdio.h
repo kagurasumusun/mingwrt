@@ -377,6 +377,9 @@ _CRTIMP int __cdecl __MINGW_NOTHROW _vsnprintf (char*, size_t, const char*, __VA
 int __cdecl __MINGW_NOTHROW snprintf (char *, size_t, const char *, ...);
 int __cdecl __MINGW_NOTHROW vsnprintf (char *, size_t, const char *, __VALIST);
 
+int __cdecl __MINGW_NOTHROW asprintf (char ** __restrict__, const char * __restrict__, ...);
+int __cdecl __MINGW_NOTHROW vasprintf (char ** __restrict__, const char * __restrict__, __VALIST);
+
 int __cdecl __MINGW_NOTHROW vscanf (const char * __restrict__, __VALIST);
 int __cdecl __MINGW_NOTHROW vfscanf (FILE * __restrict__, const char * __restrict__,
 		     __VALIST);
